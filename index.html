@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Constancias para Webinars</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="assets/logo.png" alt="Logo de la Organización" class="logo">
+            <h1>Sistema de Constancias</h1>
+            <p>Bienvenido/a al portal de gestión de constancias de nuestros webinars.</p>
+        </header>
+
+        <main>
+            <section class="flow-explanation">
+                <h2>¿Cómo funciona?</h2>
+                <ol>
+                    <li><strong>Regístrate:</strong> Inscribe tu nombre y correo electrónico una única vez para crear tu perfil.</li>
+                    <li><strong>Participa:</strong> Completa el formulario de cada sesión a la que asistas.</li>
+                    <li><strong>Recibe:</strong> Recibirás un correo automático con los enlaces a tu constancia y su verificación.</li>
+                    <li><strong>Consulta:</strong> Usa tu correo para buscar todas las constancias que has obtenido.</li>
+                </ol>
+            </section>
+
+            <section class="actions">
+                <h2>Acciones Principales</h2>
+                <div class="button-group">
+                    <a href="#" id="register-btn" class="btn btn-primary">1. Registrarse</a>
+                    <a href="buscar.html" class="btn btn-secondary">2. Buscar mis constancias</a>
+                    <a href="verificar.html" class="btn btn-secondary">3. Verificar una constancia</a>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Desarrollado con <a href="https://www.google.com/script/start/" target="_blank">Google Apps Script</a>. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN ---
+        const REGISTRATION_URL = 'https://TU_FORMULARIO_DE_REGISTRO'; // <-- REEMPLAZAR
+        // ---------------------
+
+        document.getElementById('register-btn').href = REGISTRATION_URL;
+    </script>
+</body>
+</html>

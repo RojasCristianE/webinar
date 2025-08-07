@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Mis Constancias</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="assets/logo.png" alt="Logo de la Organización" class="logo">
+            <h1>Buscar Mis Constancias</h1>
+        </header>
+
+        <main>
+            <form id="search-form">
+                <label for="search-input">Ingresa tu correo electrónico o ID completo:</label>
+                <input type="text" id="search-input" required placeholder="tucorreo@ejemplo.com o CRT_...">
+                <div class="local-hash-option">
+                    <input type="checkbox" id="local-hash" name="local-hash">
+                    <label for="local-hash">Buscar por correo (calcular hash localmente)</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </form>
+
+            <div id="result-container" class="result" style="display:none;">
+                <!-- El resultado se insertará aquí -->
+            </div>
+        </main>
+
+        <footer>
+            <p><a href="index.html">Volver al inicio</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN ---
+        const SCRIPT_URL = 'https://script.google.com/macros/s/TU_SCRIPT_ID/exec'; // <-- REEMPLAZAR
+        const REGISTRATION_URL = 'https://TU_FORMULARIO_DE_REGISTRO'; // <-- REEMPLAZAR
+        // ---------------------
+
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        const localHashCheckbox = document.getElementById('local-hash');
+        const resultContainer = document.getElementById('result-container');
+
+        function normalizeEmail(email) {
+            return email.trim().toLowerCase();
+        }
+
+        function generateIdHash(email) {
+            const normalized = normalizeEmail(email);
+            const hash = CryptoJS.SHA256(normalized).toString(CryptoJS.enc.Hex);
+            return 'CRT_' + hash.substring(0, 16).toUpperCase();
+        }
+
+        async function searchCertificates(query, useHash) {
+            resultContainer.style.display = 'block';
+            resultContainer.innerHTML = '<p class="loading">Buscando...</p>';
+
+            let searchParam = '';
+            if (useHash) {
+                const idHash = generateIdHash(query);
+                searchParam = `id_hash=${idHash}`;
+            } else {
+                if (query.toLowerCase().startsWith('crt_')) {
+                    searchParam = `id_hash=${query}`;
+                } else {
+                    searchParam = `email=${encodeURIComponent(normalizeEmail(query))}`;
+                }
+            }
+
+            try {
+                const response = await fetch(`${SCRIPT_URL}?${searchParam}`);
+                const data = await response.json();
+
+                if (!data.ok) {
+                    throw new Error(data.error || 'Respuesta no válida de la API');
+                }
+
+                if (!data.registered) {
+                    resultContainer.innerHTML = `
+                        <div class="result-info">
+                            <h2>No estás registrado</h2>
+                            <p>No encontramos un perfil con los datos proporcionados. Por favor, regístrate primero.</p>
+                            <a href="${REGISTRATION_URL}" class="btn btn-primary">Ir al registro</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let obtainedHtml = '';
+                if (data.items && data.items.length > 0) {
+                    obtainedHtml = '<h3>Constancias Obtenidas</h3><ul>' +
+                        data.items.map(item => `
+                            <li>
+                                <strong>${item.title}</strong> (Fecha: ${item.date})<br>
+                                <a href="${item.cert_url}" target="_blank">Ver Constancia</a> | 
+                                <a href="${item.verify_url}" target="_blank">Verificar</a>
+                            </li>
+                        `).join('') + '</ul>';
+                } else {
+                    obtainedHtml = '<h3>Constancias Obtenidas</h3><p>Aún no has completado ninguna sesión.</p>';
+                }
+
+                let pendingHtml = '';
+                const obtainedTitles = new Set(data.items.map(i => i.title));
+                const pendingSessions = data.sessions.filter(s => !obtainedTitles.has(s.title));
+
+                if (pendingSessions.length > 0) {
+                    pendingHtml = '<h3>Sesiones Pendientes</h3><ul>' +
+                        pendingSessions.map(session => `
+                            <li>
+                                ${session.title}
+                                <a href="${session.formUrl}" target="_blank" class="btn btn-small">Ir al formulario</a>
+                            </li>
+                        `).join('') + '</ul>';
+                } else {
+                     pendingHtml = '<h3>Sesiones Pendientes</h3><p>¡Felicidades! Has completado todas las sesiones disponibles.</p>';
+                }
+
+                resultContainer.innerHTML = obtainedHtml + pendingHtml;
+
+            } catch (error) {
+                console.error('Error en la búsqueda:', error);
+                resultContainer.innerHTML = '<div class="result-invalid"><h2>Error</h2><p>No se pudo completar la búsqueda. Inténtelo más tarde.</p></div>';
+            }
+        }
+
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            const useHash = localHashCheckbox.checked;
+            if (query) {
+                searchCertificates(query, useHash);
+            }
+        });
+
+    </script>
+</body>
+</html>

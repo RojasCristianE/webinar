@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Constancia</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="assets/logo.png" alt="Logo de la Organización" class="logo">
+            <h1>Verificación de Constancia</h1>
+        </header>
+
+        <main>
+            <form id="verify-form">
+                <label for="cert-id">Ingrese el ID de la constancia:</label>
+                <input type="text" id="cert-id" name="cert-id" required placeholder="Ej: CRT_1A2B3C4D5E6F7G8H">
+                <button type="submit" class="btn btn-primary">Verificar</button>
+            </form>
+
+            <div id="result-container" class="result" style="display:none;">
+                <!-- El resultado se insertará aquí -->
+            </div>
+        </main>
+
+        <footer>
+            <p><a href="index.html">Volver al inicio</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN ---
+        const SCRIPT_URL = 'https://script.google.com/macros/s/TU_SCRIPT_ID/exec'; // <-- REEMPLAZAR
+        // ---------------------
+
+        const verifyForm = document.getElementById('verify-form');
+        const certIdInput = document.getElementById('cert-id');
+        const resultContainer = document.getElementById('result-container');
+
+        async function verifyCertificate(id) {
+            if (!id) return;
+
+            resultContainer.style.display = 'block';
+            resultContainer.innerHTML = '<p class="loading">Verificando...</p>';
+
+            try {
+                const response = await fetch(`${SCRIPT_URL}?id=${id}`);
+                const data = await response.json();
+
+                if (data.ok && data.valid) {
+                    let scoreInfo = '';
+                    if (data.score_raw) {
+                        scoreInfo = `<li><strong>Puntaje:</strong> ${data.score_raw} (${data.score_pct.toFixed(2)}%)</li>`;
+                    }
+
+                    resultContainer.innerHTML = `
+                        <div class="result-valid">
+                            <h2>Constancia VÁLIDA</h2>
+                            <ul>
+                                <li><strong>Nombre:</strong> ${data.nombre}</li>
+                                <li><strong>Sesión:</strong> ${data.SESSION_TITLE}</li>
+                                <li><strong>Fecha:</strong> ${data.SESSION_DATE}</li>
+                                <li><strong>ID:</strong> ${data.ID}</li>
+                                ${scoreInfo}
+                            </ul>
+                            <p><a href="${data.verify_url.replace('verificar.html', 'cert.html')}" class="btn btn-secondary">Ver constancia completa</a></p>
+                        </div>
+                    `;
+                } else {
+                    resultContainer.innerHTML = '<div class="result-invalid"><h2>Constancia NO VÁLIDA</h2><p>El ID no fue encontrado o no es correcto.</p></div>';
+                }
+            } catch (error) {
+                console.error('Error al verificar:', error);
+                resultContainer.innerHTML = '<div class="result-invalid"><h2>Error</h2><p>No se pudo completar la verificación. Inténtelo más tarde.</p></div>';
+            }
+        }
+
+        verifyForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = certIdInput.value.trim();
+            verifyCertificate(id);
+        });
+
+        // Auto-verificar si el ID viene en la URL
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const idFromUrl = urlParams.get('id');
+            if (idFromUrl) {
+                certIdInput.value = idFromUrl;
+                verifyCertificate(idFromUrl);
+            }
+        });
+    </script>
+</body>
+</html>
