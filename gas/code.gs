@@ -25,13 +25,13 @@ function testSheetWrite() {
  * Reemplazar con la URL de tu sitio estático (Cloudflare/GitHub Pages).
  * @type {string}
  */
-const VERIFY_BASE = 'https://TU_DOMINIO/verificar.html?id=';
+const VERIFY_BASE = 'https://webinar.jscomunicadores.com/verificar.html?id=';
 
 /**
  * URL pública del formulario de Google para el registro de participantes.
  * @type {string}
  */
-const REGISTRATION_URL = 'https://TU_FORMULARIO_DE_REGISTRO';
+const REGISTRATION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSf-e1aINSX51u65wXH--vYvIiGNQWcFCE76Zh6gBvzz-6DOfQ/viewform?usp=header';
 
 /**
  * Nombre de la hoja de cálculo que contiene los perfiles de los participantes.
