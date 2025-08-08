@@ -1,5 +1,0 @@
-name = "webinar"
-compatibility_date = "2025-08-07"
-
-[site]
-bucket = "."
