@@ -12,7 +12,6 @@ const configContent = `
 const SCRIPT_URL = '${scriptUrl}';
 const REGISTRATION_URL = '${registrationUrl}';
 `;
-
+console.log('Generating assets/config.js');
 fs.writeFileSync('./assets/config.js', configContent);
-
 console.log('Successfully generated assets/config.js');
