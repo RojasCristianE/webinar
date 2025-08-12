@@ -1,19 +1,4 @@
 /**
-* Función de prueba para verificar permisos de escritura en la hoja activa.
-*/
-function testSheetWrite() {
-  try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const cell = sheet.getRange("A1");
-    const timestamp = new Date().("es-NI");
-    cell.setValue("TEST OK - El script escribió aquí a las: " + timestamp);
-    SpreadsheetApp.flush(); // Asegura que el cambio se guarde inmediatamente.
-  } catch (e) {                  L
-    // Si falla, intenta mostrar un pop-up con el error.
-    SpreadsheetApp.getUi().alert("Error al escribir en la hoja: " + e.message);
-  }                              
-}
-/**
  * @fileoverview Script para la gestión automatizada de constancias de webinars.
  * @version 1.0.0
  */
@@ -45,8 +30,7 @@ const PROFILE_SHEET_NAME = 'profiles';
  * @type {Array<{title: string, formUrl: string}>}
  */
 const SESSIONS = [
-  // Ejemplo:
-  // { title: 'Comunicación Popular 2025-08-01', formUrl: 'https://forms.gle/...' },
+  { title: 'Comunicación Popular 2025-08-01', formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdrH1BAeb7MNJj1FIGctMlYUZ-ALCr0eZoQpXXmoKiGW67-aA/viewform' },
   // { title: 'Planificación Estratégica 2025-08-08', formUrl: 'https://forms.gle/...' }
 ];
 
@@ -262,8 +246,6 @@ function doGet(e) {
   try {
     if (params.id) {
       result = getCertificateById(params.id);
-    } else if (params.email) {
-      result = getDataByEmail(normalizeEmail(params.email));
     } else if (params.id_hash) {
       // Esta opción es conceptualmente similar a `email` pero usando el hash.
       // Se asume que el front puede generar el hash para la búsqueda.
@@ -333,25 +315,7 @@ function getCertificateById(id) {
   return { ok: true, valid: false };
 }
 
-/**
- * Obtiene los datos de un usuario por su correo.
- * @param {string} email - Correo normalizado.
- * @return {Object} Datos del usuario.
- */
-function getDataByEmail(email) {
-  const profile = getProfileByEmail(email);
-  if (!profile) {
-    return { ok: true, registered: false, items: [], sessions: SESSIONS };
-  }
 
-  const id = profile.id;
-  return {
-    ok: true,
-    registered: true,
-    items: findUserCertificates(id),
-    sessions: SESSIONS
-  };
-}
 
 /**
  * Obtiene los datos de un usuario por el hash de su ID.
