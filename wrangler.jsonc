@@ -1,6 +1,9 @@
 {
 	"name": "webinar",
 	"compatibility_date": "2025-08-07",
+	"scripts": {
+		"build": "node generate-config.js"
+	},
 	"assets": {
 		"directory": "."
 	}
