@@ -21,17 +21,20 @@
                 <ol>
                     <li><strong>Regístrate:</strong> Inscribe tu nombre y correo electrónico una única vez para crear tu perfil.</li>
                     <li><strong>Participa:</strong> Completa el formulario de cada sesión a la que asistas.</li>
-                    <li><strong>Recibe:</strong> Recibirás un correo automático con los enlaces a tu constancia y su verificación.</li>
+                    <li><strong>Recibe:</strong> Recibirás un correo automático con los enlaces a tu constancia.</li>
                     <li><strong>Consulta:</strong> Usa tu correo para buscar todas las constancias que has obtenido.</li>
                 </ol>
             </section>
 
-            <section class="actions">
-                <h2>Acciones Principales</h2>
-                <div class="button-group">
-                    <a href="#" id="register-btn" class="btn btn-primary">1. Registrarse</a>
-                    <a href="buscar.html" class="btn btn-secondary">2. Buscar mis constancias</a>
-                    <a href="verificar.html" class="btn btn-secondary">3. Verificar una constancia</a>
+            <section class="search-section">
+                <h2>Buscar mis Constancias</h2>
+                <form id="search-form">
+                    <label for="search-input">Ingresa tu correo electrónico:</label>
+                    <input type="email" id="search-input" required placeholder="tucorreo@ejemplo.com">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </form>
+                <div id="result-container" class="result" style="display:none;">
+                    <!-- El resultado se insertará aquí -->
                 </div>
             </section>
         </main>
@@ -41,9 +44,93 @@
         </footer>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="assets/config.js"></script>
     <script>
-        document.getElementById('register-btn').href = REGISTRATION_URL;
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        const resultContainer = document.getElementById('result-container');
+
+        function normalizeEmail(email) {
+            return email.trim().toLowerCase();
+        }
+
+        function generateIdHash(email) {
+            const normalized = normalizeEmail(email);
+            const hash = CryptoJS.SHA256(normalized).toString(CryptoJS.enc.Hex);
+            return 'CRT_' + hash.substring(0, 16).toUpperCase();
+        }
+
+        async function searchCertificates(query) {
+            resultContainer.style.display = 'block';
+            resultContainer.innerHTML = '<p class="loading">Buscando...</p>';
+
+            const idHash = generateIdHash(query);
+            const searchParam = `id_hash=${idHash}`;
+
+            try {
+                const response = await fetch(`${SCRIPT_URL}?${searchParam}`);
+                const data = await response.json();
+
+                if (!data.ok) {
+                    throw new Error(data.error || 'Respuesta no válida de la API');
+                }
+
+                if (!data.registered) {
+                    resultContainer.innerHTML = `
+                        <div class="result-info">
+                            <h2>No estás registrado</h2>
+                            <p>No encontramos un perfil con el correo proporcionado. Por favor, regístrate primero.</p>
+                            <a href="${REGISTRATION_URL}" class="btn btn-primary">Ir al registro</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let obtainedHtml = '';
+                if (data.items && data.items.length > 0) {
+                    obtainedHtml = '<h3>Constancias Obtenidas</h3><ul>' +
+                        data.items.map(item => `
+                            <li>
+                                <strong>${item.title}</strong> (Fecha: ${item.date})<br>
+                                <a href="${item.cert_url}" target="_blank">Ver Constancia</a>
+                            </li>
+                        `).join('') + '</ul>';
+                } else {
+                    obtainedHtml = '<h3>Constancias Obtenidas</h3><p>Aún no has completado ninguna sesión.</p>';
+                }
+
+                let pendingHtml = '';
+                const obtainedTitles = new Set(data.items.map(i => i.title));
+                const pendingSessions = data.sessions.filter(s => !obtainedTitles.has(s.title));
+
+                if (pendingSessions.length > 0) {
+                    pendingHtml = '<h3>Sesiones Pendientes</h3><ul>' +
+                        pendingSessions.map(session => `
+                            <li>
+                                ${session.title}
+                                <a href="${session.formUrl}" target="_blank" class="btn btn-small">Ir al formulario</a>
+                            </li>
+                        `).join('') + '</ul>';
+                } else {
+                     pendingHtml = '<h3>Sesiones Pendientes</h3><p>¡Felicidades! Has completado todas las sesiones disponibles.</p>';
+                }
+
+                resultContainer.innerHTML = obtainedHtml + pendingHtml;
+
+            } catch (error) {
+                console.error('Error en la búsqueda:', error);
+                resultContainer.innerHTML = '<div class="result-invalid"><h2>Error</h2><p>No se pudo completar la búsqueda. Inténtelo más tarde.</p></div>';
+            }
+        }
+
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            if (query) {
+                searchCertificates(query);
+            }
+        });
     </script>
 </body>
 </html>
