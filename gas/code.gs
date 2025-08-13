@@ -215,7 +215,7 @@ function sendConfirmationEmail(email, profile, sessionTitle, sessionDate, id, sc
     <p>Gracias por participar en la sesión "<strong>${sessionTitle}</strong>" el día ${sessionDate}.</p>
     <p>Tu constancia ha sido emitida automáticamente. Puedes consultarla y descargarla desde los siguientes enlaces:</p>
     <ul>
-      <li><strong>Ver y descargar tu constancia:</strong> <a href="${VERIFY_BASE.replace('index.html?id=', 'cert.html?id=')}${id}">Enlace a la constancia</a></li>
+      <li><strong>Ver y descargar tu constancia:</strong> <a href="${VERIFY_BASE.replace('index.html?id=', 'index.html?cert_id=')}${id}">Enlace a la constancia</a></li>
       <li><strong>Verificar la validez:</strong> <a href="${VERIFY_BASE}${id}">Enlace de verificación</a></li>
     </ul>
   `;
@@ -390,7 +390,7 @@ function findUserCertificates(id) {
           id: row[idCol], // Este es el ID de la constancia específica
           title: sheetName,
           date: formatDate(row[tsCol]),
-          cert_url: VERIFY_BASE.replace('index.html?id=', 'cert.html?id=') + row[idCol],
+          cert_url: VERIFY_BASE.replace('index.html?id=', 'index.html?cert_id=') + row[idCol],
           verify_url: VERIFY_BASE + row[idCol]
         });
       }

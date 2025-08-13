@@ -15,6 +15,13 @@
             <p>Bienvenido/a al portal de gestión de constancias de nuestros webinars.</p>
         </header>
 
+        <div class="container">
+        <header>
+            <img src="assets/logo.png" alt="Logo de la Organización" class="logo">
+            <h1>Sistema de Constancias</h1>
+            <p>Bienvenido/a al portal de gestión de constancias de nuestros webinars.</p>
+        </header>
+
         <main>
             <section class="flow-explanation">
                 <h2>¿Cómo funciona?</h2>
@@ -44,12 +51,118 @@
         </footer>
     </div>
 
+    <!-- Modal de Constancia -->
+    <div id="certificate-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="toolbar">
+                <button id="download-pdf" class="btn btn-primary">Descargar PDF</button>
+            </div>
+            <div id="certificate-display" class="certificate">
+                <div class="cert-header">
+                    <img src="assets/logo.png" alt="Logo" class="cert-logo">
+                    <h1>Constancia de Participación</h1>
+                </div>
+                <div class="cert-body">
+                    <p class="granted-to">Otorgada a:</p>
+                    <h2 id="cert-name">Cargando...</h2>
+                    <p class="for-participation">Por su participación en el webinar:</p>
+                    <h3 id="cert-session">Cargando...</h3>
+                    <p class="on-date">Realizado el <span id="cert-date">Cargando...</span></p>
+                    <p id="cert-score" class="score-info" style="display:none;">Puntaje obtenido: <strong></strong></p>
+                </div>
+                <div class="cert-footer">
+                    <div class="qr-code" id="qr-code"></div>
+                    <div class="verification-info">
+                        <p>Para verificar la autenticidad de esta constancia, escanee el código QR.</p>
+                        <p>ID de la constancia: <strong id="cert-id">Cargando...</strong></p>
+                    </div>
+                </div>
+            </div>
+            <div id="loading-message-modal" class="loading-container" style="display:none;">
+                <p class="loading">Cargando datos de la constancia...</p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Estilos del Modal */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
+            padding-top: 20px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 1000px; /* Same as certificate width */
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            right: 20px;
+            top: 10px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Ajustes para el certificado dentro del modal */
+        .modal .certificate {
+            border: none; /* Remove border as modal has its own */
+            padding: 0; /* Remove padding as modal content has its own */
+            width: 100%; /* Adjust to modal width */
+            height: auto; /* Adjust height automatically */
+            box-shadow: none; /* Remove shadow */
+        }
+
+        .modal .toolbar {
+            box-shadow: none;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+            }
+        }
+    </style>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="assets/config.js"></script>
     <script>
         const searchForm = document.getElementById('search-form');
         const searchInput = document.getElementById('search-input');
         const resultContainer = document.getElementById('result-container');
+        const certificateModal = document.getElementById('certificate-modal');
+        const closeButton = document.querySelector('.close-button');
+        const certificateDisplay = document.getElementById('certificate-display');
+        const downloadPdfButton = document.getElementById('download-pdf');
+        const loadingMessageModal = document.getElementById('loading-message-modal');
 
         function normalizeEmail(email) {
             return email.trim().toLowerCase();
@@ -93,7 +206,7 @@
                         data.items.map(item => `
                             <li>
                                 <strong>${item.title}</strong> (Fecha: ${item.date})<br>
-                                <a href="${item.cert_url}" target="_blank">Ver Constancia</a>
+                                <a href="#" class="view-cert-btn" data-cert-id="${item.id}">Ver Constancia</a>
                             </li>
                         `).join('') + '</ul>';
                 } else {
@@ -118,12 +231,57 @@
 
                 resultContainer.innerHTML = obtainedHtml + pendingHtml;
 
+                // Add event listeners to new "Ver Constancia" buttons
+                document.querySelectorAll('.view-cert-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const certId = e.target.dataset.certId;
+                        openCertificateModal(certId);
+                    });
+                });
+
             } catch (error) {
                 console.error('Error en la búsqueda:', error);
                 resultContainer.innerHTML = '<div class="result-invalid"><h2>Error</h2><p>No se pudo completar la búsqueda. Inténtelo más tarde.</p></div>';
             }
         }
 
+        async function openCertificateModal(id) {
+            certificateModal.style.display = 'block';
+            certificateDisplay.style.display = 'none';
+            loadingMessageModal.style.display = 'block';
+
+            try {
+                const response = await fetch(`${SCRIPT_URL}?id=${id}`);
+                const data = await response.json();
+
+                if (data.ok && data.valid) {
+                    document.getElementById('cert-name').textContent = data.nombre || 'Participante';
+                    document.getElementById('cert-session').textContent = data.SESSION_TITLE;
+                    document.getElementById('cert-date').textContent = data.SESSION_DATE;
+                    document.getElementById('cert-id').textContent = data.ID;
+                    
+                    // Clear previous QR code
+                    document.getElementById("qr-code").innerHTML = '';
+                    // Generate new QR
+                    new QRCode(document.getElementById("qr-code"), {
+                        text: data.verify_url,
+                        width: 100,
+                        height: 100,
+                    });
+
+                    loadingMessageModal.style.display = 'none';
+                    certificateDisplay.style.display = 'block';
+                } else {
+                    loadingMessageModal.innerHTML = '<p class="error">Error: Constancia no encontrada o no válida.</p>';
+                }
+            } catch (error) {
+                console.error('Error al cargar la constancia:', error);
+                loadingMessageModal.innerHTML = '<p class="error">No se pudo cargar la constancia. Inténtelo más tarde.</p>';
+            }
+        }
+
+        // Event Listeners
         searchForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const query = searchInput.value.trim();
@@ -131,6 +289,44 @@
                 searchCertificates(query);
             }
         });
+
+        closeButton.addEventListener('click', () => {
+            certificateModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target == certificateModal) {
+                certificateModal.style.display = 'none';
+            }
+        });
+
+        downloadPdfButton.addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const cert = document.getElementById('certificate-display');
+            const certId = document.getElementById('cert-id').textContent;
+
+            html2canvas(cert, { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'pt',
+                    format: [canvas.width, canvas.height]
+                });
+                pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                pdf.save(`Constancia-${certId}.pdf`);
+            });
+        });
+
+        // Check for cert_id in URL on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const certIdFromUrl = urlParams.get('cert_id');
+            if (certIdFromUrl) {
+                openCertificateModal(certIdFromUrl);
+            }
+        });
     </script>
+</body>
+</html>
 </body>
 </html>
