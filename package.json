@@ -1,0 +1,21 @@
+{
+  "name": "webinar",
+  "version": "1.0.0",
+  "description": "Este proyecto implementa un sistema automatizado para emitir y verificar constancias de participación en webinars, utilizando Google Apps Script como backend y un frontend estático (HTML, CSS, JS) que puede ser alojado en servicios como Cloudflare Pages o GitHub Pages.",
+  "main": "update-config-script-url.js",
+  "scripts": {
+    "update-script-url": "node update-config-script-url.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RojasCristianE/webinar.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RojasCristianE/webinar/issues"
+  },
+  "homepage": "https://github.com/RojasCristianE/webinar#readme"
+}

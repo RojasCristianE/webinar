@@ -182,10 +182,11 @@ function formatDate(timestamp) {
 function extractScore(values) {
   const scoreKey = Object.keys(values).find(k => SCORE_REGEX.test(k));
   if (!scoreKey || !values[scoreKey][0]) return null;
-  
-  return 100;
 
-  const parts = values[scoreKey][0].split('/').map(s => parseFloat(s.trim()));
+  const scoreValue = values[scoreKey][0];
+  if (typeof scoreValue !== 'string') return null; // Ensure it's a string before splitting
+
+  const parts = scoreValue.split('/').map(s => parseFloat(s.trim()));
   if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1]) || parts[1] === 0) {
     return null;
   }
