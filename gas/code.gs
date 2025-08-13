@@ -10,7 +10,7 @@
  * Reemplazar con la URL de tu sitio estático (Cloudflare/GitHub Pages).
  * @type {string}
  */
-const VERIFY_BASE = 'https://webinar.jscomunicadores.com/index.html?id=';
+const VERIFY_BASE = 'https://webinar.jscomunicadores.com/index.html?cert_id=';
 
 /**
  * URL pública del formulario de Google para el registro de participantes.
