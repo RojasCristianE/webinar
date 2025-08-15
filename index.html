@@ -247,8 +247,8 @@
                     pendingHtml = '<h3>Sesiones Pendientes</h3><ul>' +
                         pendingSessions.map(session => `
                             <li>
-                                ${session.title}
-                                <a href="${session.formUrl}" target="_blank" class="btn btn-small">Ir al formulario</a>
+                                ${session.title}<br>
+                                <a href="${session.formUrl}" target="_blank" >Ir al formulario</a>
                             </li>
                         `).join('') + '</ul>';
                 } else {
