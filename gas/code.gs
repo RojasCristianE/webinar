@@ -30,12 +30,12 @@ const PROFILE_SHEET_NAME = 'profiles';
  * @type {Array<{title: string, formUrl: string}>}
  */
 const SESSIONS = [
-  { title: 'Comunicación Popular 2025-08-01', formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdrH1BAeb7MNJj1FIGctMlYUZ-ALCr0eZoQpXXmoKiGW67-aA/viewform' },
-  // { title: 'Planificación Estratégica 2025-08-08', formUrl: 'https://forms.gle/...' }
+  { title: 'Módulo II', formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdrH1BAeb7MNJj1FIGctMlYUZ-ALCr0eZoQpXXmoKiGW67-aA/viewform' },
+  { title: 'Módulo I',  formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSda40rO-rYBCL-i6i6vyo3hVzv75i2zzuFGB4FNt5Xpi9cGXA/viewform' }
 ];
 
 // --- Constantes del Script (NO EDITAR) ---
-const SCRIPT_VERSION = '1.0.0';
+const SCRIPT_VERSION = '1.0.1';
 const ID_PREFIX = 'CRT_';
 const ID_LENGTH = 16;
 const EMAIL_HEADER = 'Dirección de correo electrónico';
