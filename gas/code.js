@@ -347,11 +347,15 @@ function getDataByIdHash(idHash) {
         return { ok: true, registered: false, items: [], sessions: SESSIONS };
     }
 
+    const userCertificates = findUserCertificates(idHash);
+    const completedTitles = new Set(userCertificates.map(cert => cert.title));
+    const pendingSessions = SESSIONS.filter(session => !completedTitles.has(session.title));
+
     return {
         ok: true,
         registered: true,
-        items: findUserCertificates(idHash),
-        sessions: SESSIONS
+        items: userCertificates,
+        sessions: pendingSessions
     };
 }
 
