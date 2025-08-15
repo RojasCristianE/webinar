@@ -185,10 +185,13 @@ form button {
     padding: 40px;
     background: #fff;
     position: relative;
-    width: 1000px; /* A4-like landscape proportions */
-    height: 700px;
+    width: 1000px; /* Base width for consistent layout */
+    height: 773px; /* Adjusted for 3300x2550 aspect ratio */
     box-sizing: border-box;
     margin: 0 auto;
+    background-image: url('/home/cristian/Software/webinar/assets/certificate-bg.avif');
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .cert-header, .cert-body, .cert-footer {
@@ -266,17 +269,5 @@ footer {
     h1 { font-size: 1.8em; }
     .button-group { flex-direction: column; }
 
-    .certificate {
-        width: 100%;
-        height: auto;
-        padding: 20px;
-        border-width: 5px;
-    }
-    .cert-footer {
-        position: static;
-        flex-direction: column;
-        margin-top: 30px;
-    }
-    .qr-code { margin-bottom: 20px; }
-    .verification-info { text-align: center; }
+    /* Certificate styles are now fixed and will not change on mobile */
 }

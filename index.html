@@ -15,16 +15,6 @@
             <p>Bienvenido/a al portal de gestión de constancias de nuestros webinars.</p>
         </header>
         <main>
-            <section class="flow-explanation">
-                <h2>¿Cómo funciona?</h2>
-                <ol>
-                    <li><strong>Regístrate:</strong> Inscribe tu nombre y correo electrónico una única vez para crear tu perfil.</li>
-                    <li><strong>Participa:</strong> Completa el formulario de cada sesión a la que asistas.</li>
-                    <li><strong>Recibe:</strong> Recibirás un correo automático con los enlaces a tu constancia.</li>
-                    <li><strong>Consulta:</strong> Usa tu correo para buscar todas las constancias que has obtenido.</li>
-                </ol>
-            </section>
-
             <section class="search-section">
                 <h2>Buscar mis Constancias</h2>
                 <form id="search-form">
@@ -36,38 +26,49 @@
                     <!-- El resultado se insertará aquí -->
                 </div>
             </section>
+            <section class="flow-explanation">
+                <h2>¿Cómo funciona?</h2>
+                <ol>
+                    <li><strong>Consulta:</strong> Ingresa tu correo electrónico para ver tus constancias obtenidas y sesiones pendientes.</li>
+                    <li><strong>Regístrate:</strong> Si tu correo no se encuentra, nuestro sistema te invitará a registrarte.</li>
+                    <li><strong>Participa:</strong> Completa el formulario de cada sesión para recibir tu constancia por correo.</li>
+                    <li><strong>Gestiona:</strong> Desde aquí puedes ver, descargar o verificar todas tus constancias.</li>
+                </ol>
+            </section>
         </main>
 
         <footer>
-            <p>Desarrollado con <a href="https://www.google.com/script/start/" target="_blank" rel="noopener">Google Apps Script</a>. Todos los derechos reservados.</p>
+            <p>Desarrollado por <a href="https://jscomunicadores.com/" target="_blank" rel="noopener">Red de Comunicadores</a>. Todos los derechos reservados.</p>
         </footer>
     </div>
 
     <!-- Modal de Constancia -->
     <div id="certificate-modal" class="modal">
         <div class="modal-content">
-            <span class="close-button">&times;</span>
+            <span class="close-button">&times;</span>   
             <div class="toolbar">
-                <button id="download-pdf" class="btn btn-primary">Descargar PDF</button>
+                <button id="download-pdf" class="btn btn-primary">Descargar</button>
             </div>
-            <div id="certificate-display" class="certificate">
-                <div class="cert-header">
-                    <img src="assets/logo.png" alt="Logo" class="cert-logo">
-                    <h1>Constancia de Participación</h1>
-                </div>
-                <div class="cert-body">
-                    <p class="granted-to">Otorgada a:</p>
-                    <h2 id="cert-name">Cargando...</h2>
-                    <p class="for-participation">Por su participación en el webinar:</p>
-                    <h3 id="cert-session">Cargando...</h3>
-                    <p class="on-date">Realizado el <span id="cert-date">Cargando...</span></p>
-                    <p id="cert-score" class="score-info" style="display:none;">Puntaje obtenido: <strong></strong></p>
-                </div>
-                <div class="cert-footer">
-                    <div class="qr-code" id="qr-code"></div>
-                    <div class="verification-info">
-                        <p>Para verificar la autenticidad de esta constancia, escanee el código QR.</p>
-                        <p>ID de la constancia: <strong id="cert-id">Cargando...</strong></p>
+            <div id="certificate-wrapper" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <div id="certificate-display" class="certificate">
+                    <div class="cert-header">
+                        <img src="assets/logo.png" alt="Logo" class="cert-logo">
+                        <h1>Constancia de Participación</h1>
+                    </div>
+                    <div class="cert-body">
+                        <p class="granted-to">Otorgada a:</p>
+                        <h2 id="cert-name">Cargando...</h2>
+                        <p class="for-participation">Por su participación en el webinar:</p>
+                        <h3 id="cert-session">Cargando...</h3>
+                        <p class="on-date">Realizado el <span id="cert-date">Cargando...</span></p>
+                        <p id="cert-score" class="score-info" style="display:none;">Puntaje obtenido: <strong></strong></p>
+                    </div>
+                    <div class="cert-footer">
+                        <div class="qr-code" id="qr-code"></div>
+                        <div class="verification-info">
+                            <p>Para verificar la autenticidad de esta constancia, escanee el código QR.</p>
+                            <p>O ingrese a la dirección: <strong id="cert-id">Cargando...</strong></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -124,8 +125,6 @@
         .modal .certificate {
             border: none; /* Remove border as modal has its own */
             padding: 0; /* Remove padding as modal content has its own */
-            width: 100%; /* Adjust to modal width */
-            height: auto; /* Adjust height automatically */
             box-shadow: none; /* Remove shadow */
         }
 
@@ -138,6 +137,37 @@
             .modal-content {
                 width: 95%;
             }
+        }
+
+        /* Spinner styles */
+        .loading-container {
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #303f9f;
+            animation: spin 1s ease infinite;
+            margin: 20px auto 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Placeholder animation */
+        .loading-text {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
     </style>
 
@@ -168,7 +198,11 @@
 
         async function searchCertificates(query) {
             resultContainer.style.display = 'block';
-            resultContainer.innerHTML = '<p class="loading">Buscando...</p>';
+            resultContainer.innerHTML = `
+                <div class="loading-container">
+                    <div class="spinner"></div>
+                    <p class="loading" style="padding:0;">Buscando...</p>
+                </div>`;
 
             const idHash = generateIdHash(query);
             const searchParam = `id_hash=${idHash}`;
@@ -186,7 +220,7 @@
                         <div class="result-info">
                             <h2>No estás registrado</h2>
                             <p>No encontramos un perfil con el correo proporcionado. Por favor, regístrate primero.</p>
-                            <a href="${REGISTRATION_URL}" class="btn btn-primary">Ir al registro</a>
+                            <a href="${REGISTRATION_URL}" target="_blank" class="btn btn-primary">Registrarme</a>
                         </div>
                     `;
                     return;
@@ -239,37 +273,60 @@
         }
 
         async function openCertificateModal(id) {
+            // Show modal and certificate structure immediately
             certificateModal.style.display = 'block';
-            certificateDisplay.style.display = 'none';
-            loadingMessageModal.style.display = 'block';
+            certificateDisplay.style.display = 'block';
+            loadingMessageModal.style.display = 'none';
+
+            // Reset to loading state
+            const nameEl = document.getElementById('cert-name');
+            const sessionEl = document.getElementById('cert-session');
+            const dateEl = document.getElementById('cert-date');
+            const idEl = document.getElementById('cert-id');
+            const qrEl = document.getElementById('qr-code');
+
+            nameEl.textContent = 'Cargando...';
+            sessionEl.textContent = 'Cargando...';
+            dateEl.textContent = '...';
+            idEl.textContent = '...';
+            qrEl.innerHTML = '';
+
+            const elementsToAnimate = [nameEl, sessionEl, dateEl, idEl];
+            elementsToAnimate.forEach(el => el.classList.add('loading-text'));
+            
+            downloadPdfButton.disabled = true;
 
             try {
                 const response = await fetch(`${SCRIPT_URL}?id=${id}`);
                 const data = await response.json();
 
+                elementsToAnimate.forEach(el => el.classList.remove('loading-text'));
+
                 if (data.ok && data.valid) {
-                    document.getElementById('cert-name').textContent = data.nombre || 'Participante';
-                    document.getElementById('cert-session').textContent = data.SESSION_TITLE;
-                    document.getElementById('cert-date').textContent = data.SESSION_DATE;
-                    document.getElementById('cert-id').textContent = data.ID;
+                    nameEl.textContent = data.nombre || 'Participante';
+                    sessionEl.textContent = data.SESSION_TITLE;
+                    dateEl.textContent = data.SESSION_DATE;
+                    idEl.textContent = data.ID;
                     
-                    // Clear previous QR code
-                    document.getElementById("qr-code").innerHTML = '';
-                    // Generate new QR
-                    new QRCode(document.getElementById("qr-code"), {
+                    new QRCode(qrEl, {
                         text: data.verify_url,
                         width: 100,
                         height: 100,
                     });
+                    
+                    downloadPdfButton.disabled = false;
 
-                    loadingMessageModal.style.display = 'none';
-                    certificateDisplay.style.display = 'block';
                 } else {
-                    loadingMessageModal.innerHTML = '<p class="error">Error: Constancia no encontrada o no válida.</p>';
+                    certificateDisplay.style.display = 'none';
+                    loadingMessageModal.style.display = 'block';
+                    loadingMessageModal.innerHTML = `<p class="error">Error: Constancia no encontrada o no válida.</p>`;
                 }
             } catch (error) {
+                elementsToAnimate.forEach(el => el.classList.remove('loading-text'));
                 console.error('Error al cargar la constancia:', error);
-                loadingMessageModal.innerHTML = '<p class="error">No se pudo cargar la constancia. Inténtelo más tarde.</p>';
+                certificateDisplay.style.display = 'none';
+                loadingMessageModal.style.display = 'block';
+                loadingMessageModal.innerHTML = `<p class="error">No se pudo cargar la constancia. Inténtelo más tarde.</p>`;
             }
         }
 
@@ -293,11 +350,12 @@
         });
 
         downloadPdfButton.addEventListener('click', () => {
+            if (downloadPdfButton.disabled) return;
             const { jsPDF } = window.jspdf;
             const cert = document.getElementById('certificate-display');
             const certId = document.getElementById('cert-id').textContent;
 
-            html2canvas(cert, { scale: 2 }).then(canvas => {
+            html2canvas(cert, { scale: 2, useCORS: true }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
                 const pdf = new jsPDF({
                     orientation: 'landscape',
