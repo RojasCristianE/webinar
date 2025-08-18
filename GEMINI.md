@@ -7,7 +7,7 @@ This project is a serverless system for managing and issuing webinar participati
 **Key Technologies:**
 
 *   **Frontend:** HTML, CSS, JavaScript
-    *   **Libraries:** CryptoJS (for hashing), QRCode.js (for QR codes), jsPDF & html2canvas (for PDF generation)
+    *   **Libraries:** CryptoJS (for hashing), QRCodeStyling (for QR codes), jsPDF & html2canvas (for PDF generation)
 *   **Backend:** Google Apps Script (`code.gs`)
 *   **Database:** Google Sheets
 *   **Deployment:** The frontend is designed for static hosting services like Cloudflare Pages or GitHub Pages. The `wrangler.jsonc` file indicates a Cloudflare Pages deployment.
@@ -16,7 +16,7 @@ This project is a serverless system for managing and issuing webinar participati
 
 The system is composed of two main parts:
 
-1.  **Static Frontend:** A set of HTML pages (`index.html`, `verificar.html`, `cert.html`, `buscar.html`) that provide the user interface for registering, searching for, and verifying certificates.
+1.  **Static Frontend:** A single HTML page (`index.html`) that provides the user interface for registering, searching for, and verifying certificates. The functionalities previously in `verificar.html`, `cert.html`, and `buscar.html` have been consolidated into `index.html`.
 2.  **Serverless Backend:** A Google Apps Script that acts as a JSON API. It handles the business logic of the application, such as creating and retrieving certificate data from a Google Sheet.
 
 ## Building and Running
@@ -34,7 +34,6 @@ This project does not have a traditional build process. It is deployed by hostin
 The `wrangler.jsonc` file suggests that the project can be deployed using the Cloudflare Wrangler CLI. The following command would likely be used to deploy the site:
 
 ```bash
-# TODO: Verify the exact deployment command. It might be:
 wrangler pages deploy .
 ```
 
