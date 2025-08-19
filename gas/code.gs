@@ -31,7 +31,7 @@ const PROFILE_SHEET_NAME = 'profiles';
  */
 const SESSIONS = [
   // { title: 'Módulo II', formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdrH1BAeb7MNJj1FIGctMlYUZ-ALCr0eZoQpXXmoKiGW67-aA/viewform' },
-  { title: 'Módulo I',  formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSda40rO-rYBCL-i6i6vyo3hVzv75i2zzuFGB4FNt5Xpi9cGXA/viewform' }
+  { title: 'Introducción a la IA Generativa',  formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSda40rO-rYBCL-i6i6vyo3hVzv75i2zzuFGB4FNt5Xpi9cGXA/viewform' }
 ];
 
 // --- Constantes del Script (NO EDITAR) ---
