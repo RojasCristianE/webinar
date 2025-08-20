@@ -6,7 +6,7 @@ const configFilePath = path.join(__dirname, 'assets', 'config.js');
 
 try {
   console.log('Deploying Google Apps Script and getting new URL...');
-  const deployOutput = execSync('cd gas && clasp push &&clasp deploy', { encoding: 'utf-8' });
+  const deployOutput = execSync('cd gas && clasp push && clasp deploy', { encoding: 'utf-8' });
   console.log('clasp deploy output:', deployOutput);
 
   const match = deployOutput.match(/Deployed (AKfycb[a-zA-Z0-9_-]+) @(\d+)/);

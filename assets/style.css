@@ -21,13 +21,10 @@ body {
 header {
     text-align: center;
     border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 20px;
-    margin-bottom: 30px;
 }
 
 .logo {
-    max-width: 120px;
-    margin-bottom: 15px;
+    max-width: 333px;
 }
 
 h1 {
@@ -199,8 +196,7 @@ form button {
 }
 
 .cert-logo {
-    max-width: 150px;
-    margin-bottom: 20px;
+    max-width: 300px;
 }
 
 .cert-header h1 {

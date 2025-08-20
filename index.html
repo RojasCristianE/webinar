@@ -6,17 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Constancias para Webinars</title>
     <link rel="stylesheet" href="assets/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&amp;display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Webinar" />
+    <link rel="manifest" href="/site.webmanifest" />
 </head>
 
 <body>
     <div class="container">
         <header>
-            <img src="assets/logo.png" alt="Logo de la Organización" class="logo">
-            <h1>Sistema de Constancias</h1>
-            <p>Bienvenido/a al portal de gestión de constancias de nuestros webinars.</p>
+            <picture>
+                <source srcset="assets/logo@1x.avif 1x, assets/logo@2x.avif 2x" type="image/avif">
+                <source srcset="assets/logo@1x.webp 1x, assets/logo@2x.webp 2x" type="image/webp">
+                <img src="assets/logo.png" width="333" height="104" alt="Logo - Red de Comunicadores" class="logo">
+            </picture>
         </header>
         <main>
             <section class="search-section">
@@ -203,6 +208,7 @@
         const certificateDisplay = document.getElementById('certificate-display');
         const downloadPdfButton = document.getElementById('download-pdf');
         const loadingMessageModal = document.getElementById('loading-message-modal');
+        let googleFontLoaded = false;
 
         function normalizeEmail(email) {
             return email.trim().toLowerCase();
@@ -293,6 +299,13 @@
         let currentCertId = null;
 
         async function openCertificateModal(id) {
+            if (!googleFontLoaded) {
+                const fontLink = document.createElement('link');
+                fontLink.href = 'https://fonts.googleapis.com/css2?family=Pirata+One&display=swap';
+                fontLink.rel = 'stylesheet';
+                document.head.appendChild(fontLink);
+                googleFontLoaded = true;
+            }
             // Show modal and certificate structure immediately
             certificateModal.style.display = 'block';
             certificateDisplay.style.display = 'block';
