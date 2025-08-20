@@ -107,8 +107,7 @@ function handleSessionSubmission(sheet, row, email, values) {
   const sessionDate = formatDate(values[TIMESTAMP_HEADER][0]);
   const score = extractScore(values);
 
-  // 3. Enviar correo de confirmación
-  sendConfirmationEmail(email, profile, sessionTitle, sessionDate, id, score);
+  
 }
 
 /**
@@ -198,44 +197,7 @@ function extractScore(values) {
   };
 }
 
-/**
- * Envía el correo de confirmación al participante.
- * @param {string} email - Correo del destinatario.
- * @param {{name: string}} profile - Perfil del usuario.
- * @param {string} sessionTitle - Título de la sesión.
- * @param {string} sessionDate - Fecha de la sesión.
- * @param {string} id - ID de la constancia.
- * @param {Object} score - Puntaje obtenido.
- */
-function sendConfirmationEmail(email, profile, sessionTitle, sessionDate, id, score) {
-  const subject = `Tu constancia de participación: ${sessionTitle}`;
-  const name = profile ? profile.name : 'participante';
-  let body = `
-    <p>Hola ${name},</p>
-    <p>Gracias por participar en la sesión "<strong>${sessionTitle}</strong>" el día ${sessionDate}.</p>
-    <p>Tu constancia ha sido emitida automáticamente. Puedes consultarla y descargarla desde los siguientes enlaces:</p>
-    <ul>
-      <li><strong>Ver y descargar tu constancia:</strong> <a href="${VERIFY_BASE.replace('index.html?id=', 'index.html?cert_id=')}${id}">Enlace a la constancia</a></li>
-      <li><strong>Verificar la validez:</strong> <a href="${VERIFY_BASE}${id}">Enlace de verificación</a></li>
-    </ul>
-  `;
 
-  if (score) {
-    body += `<p>Tu puntaje en la evaluación fue: <strong>${score.raw}</strong> (${score.pct.toFixed(2)}%).</p>`;
-  }
-
-  body += `
-    <p>Saludos cordiales,<br>El equipo organizador.</p>
-    <p><small>ID de constancia: ${id}</small></p>
-  `;
-
-  MailApp.sendEmail({
-    to: email,
-    subject: subject,
-    htmlBody: body,
-    name: 'Sistema de Constancias'
-  });
-}
 
 /**
  * Maneja las solicitudes GET a la Web App (API JSON/JSONP).
