@@ -209,6 +209,7 @@
         const downloadPdfButton = document.getElementById('download-pdf');
         const loadingMessageModal = document.getElementById('loading-message-modal');
         let googleFontLoaded = false;
+        let shouldReloadOnFocus = false; // Flag to control focus-reload behavior
 
         function resetView() {
             resultContainer.style.display = 'none';
@@ -397,9 +398,10 @@
         });
 
         resultContainer.addEventListener('click', (e) => {
-            // Reset view when clicking a link that opens a new tab (registration or forms)
+            // When clicking a link to a new tab, reset the view and set the flag to reload on focus
             if (e.target.tagName === 'A' && e.target.target === '_blank') {
                 resetView();
+                shouldReloadOnFocus = true; // Arm the focus listener
             }
         });
 
@@ -439,12 +441,15 @@
             }
         });
 
-        // Reload search results when the tab gains focus
+        // Reload search results when the tab gains focus, ONLY if a link was clicked
         window.addEventListener('focus', () => {
-            const query = searchInput.value.trim();
-            // Only search if there is a query and the modal is not open
-            if (query && certificateModal.style.display === 'none') {
-                searchCertificates(query);
+            if (shouldReloadOnFocus) {
+                shouldReloadOnFocus = false; // Disarm the listener immediately
+                const query = searchInput.value.trim();
+                // Only search if there is a query and the modal is not open
+                if (query && certificateModal.style.display === 'none') {
+                    searchCertificates(query);
+                }
             }
         });
     </script>
