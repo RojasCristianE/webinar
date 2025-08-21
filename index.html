@@ -396,6 +396,13 @@
             }
         });
 
+        resultContainer.addEventListener('click', (e) => {
+            // Reset view when clicking a link that opens a new tab (registration or forms)
+            if (e.target.tagName === 'A' && e.target.target === '_blank') {
+                resetView();
+            }
+        });
+
         closeButton.addEventListener('click', () => {
             certificateModal.style.display = 'none';
         });
