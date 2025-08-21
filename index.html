@@ -210,6 +210,11 @@
         const loadingMessageModal = document.getElementById('loading-message-modal');
         let googleFontLoaded = false;
 
+        function resetView() {
+            resultContainer.style.display = 'none';
+            resultContainer.innerHTML = '';
+        }
+
         function normalizeEmail(email) {
             return email.trim().toLowerCase();
         }
@@ -221,6 +226,7 @@
         }
 
         async function searchCertificates(query) {
+            resetView();
             resultContainer.style.display = 'block';
             resultContainer.innerHTML = `
                 <div class="loading-container">
@@ -299,6 +305,7 @@
         let currentCertId = null;
 
         async function openCertificateModal(id) {
+            resetView();
             if (!googleFontLoaded) {
                 const fontLink = document.createElement('link');
                 fontLink.href = 'https://fonts.googleapis.com/css2?family=Pirata+One&display=swap';
@@ -422,6 +429,15 @@
             const certIdFromUrl = urlParams.get('cert_id');
             if (certIdFromUrl) {
                 openCertificateModal(certIdFromUrl);
+            }
+        });
+
+        // Reload search results when the tab gains focus
+        window.addEventListener('focus', () => {
+            const query = searchInput.value.trim();
+            // Only search if there is a query and the modal is not open
+            if (query && certificateModal.style.display === 'none') {
+                searchCertificates(query);
             }
         });
     </script>
