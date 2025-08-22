@@ -24,7 +24,9 @@ header {
 }
 
 .logo {
-    max-width: 333px;
+    width: 333px;
+    max-width: 100%;
+    height: auto;
 }
 
 h1 {
