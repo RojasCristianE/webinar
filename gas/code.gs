@@ -30,7 +30,7 @@ const PROFILE_SHEET_NAME = 'profiles';
  * @type {Array<{title: string, formUrl: string}>}
  */
 const SESSIONS = [
-  // { title: 'Módulo II', formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdrH1BAeb7MNJj1FIGctMlYUZ-ALCr0eZoQpXXmoKiGW67-aA/viewform' },
+  { title: 'Explorando las Funciones Inteligentes de la IA', formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdrH1BAeb7MNJj1FIGctMlYUZ-ALCr0eZoQpXXmoKiGW67-aA/viewform' },
   { title: 'Introducción a la IA Generativa',  formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSda40rO-rYBCL-i6i6vyo3hVzv75i2zzuFGB4FNt5Xpi9cGXA/viewform' }
 ];
 
