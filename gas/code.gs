@@ -91,7 +91,7 @@ function handleProfileRegistration(sheet, row, email) {
  */
 function handleSessionSubmission(sheet, row, email, values) {
   const sessionName = sheet.getName();
-  const certificateId = generateId(email + sessionName);
+  const certificateId = generateId(sessionName + row);
   const headers = getHeaders(sheet);
 
   // 1. Escribir ID de la constancia
@@ -365,4 +365,72 @@ function findUserCertificates(id) {
     }
   }
   return certificates;
+}
+
+/**
+ * Se ejecuta cuando un usuario abre la hoja de cálculo.
+ * Agrega un menú personalizado para ejecutar funciones administrativas.
+ */
+function onOpen() {
+  SpreadsheetApp.getUi()
+      .createMenu('Administración')
+      .addItem('Regenerar IDs de Constancias', 'regenerateCertificateIds')
+      .addToUi();
+}
+
+/**
+ * Regenera los IDs de todas las constancias existentes en todas las hojas de sesiones.
+ * Utiliza el nombre de la hoja y el número de fila para garantizar un ID único.
+ * Esta función está diseñada para ser ejecutada manualmente desde el menú "Administración".
+ */
+function regenerateCertificateIds() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheets = ss.getSheets();
+  let updatedCount = 0;
+  const ui = SpreadsheetApp.getUi();
+
+  try {
+    for (const sheet of sheets) {
+      const sheetName = sheet.getName();
+      if (sheetName === PROFILE_SHEET_NAME) {
+        continue; // Omitir la hoja de perfiles
+      }
+
+      Logger.log(`Procesando hoja: ${sheetName}`);
+      const dataRange = sheet.getDataRange();
+      const values = dataRange.getValues();
+      const headers = values[0];
+      
+      let idCol = headers.indexOf(ID_HEADER);
+
+      // Si la columna ID no existe, la crea.
+      if (idCol === -1) {
+        sheet.getRange(1, headers.length + 1).setValue(ID_HEADER);
+        idCol = headers.length; // El nuevo índice es el último
+        Logger.log(`Columna ID creada en la hoja '${sheetName}' en la posición: ${idCol + 1}`);
+      }
+
+      // Iterar sobre las filas de datos (a partir de la segunda fila)
+      for (let i = 1; i < values.length; i++) {
+        const rowData = values[i];
+        const rowNumber = i + 1; // El número de fila en la hoja es 1-based
+
+        // Omitir filas vacías
+        if (rowData.join('').length === 0) {
+          continue;
+        }
+
+        const newId = generateId(sheetName + rowNumber);
+        sheet.getRange(rowNumber, idCol + 1).setValue(newId);
+        updatedCount++;
+      }
+    }
+    
+    ui.alert(`Proceso completado. Se regeneraron ${updatedCount} IDs de constancias.`);
+    Logger.log(`Proceso completado. Se regeneraron ${updatedCount} IDs de constancias.`);
+
+  } catch (e) {
+    Logger.log(`Error durante la regeneración de IDs: ${e.message}`);
+    ui.alert(`Ocurrió un error: ${e.message}. Revisa los logs para más detalles.`);
+  }
 }
