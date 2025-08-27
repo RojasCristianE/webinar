@@ -229,7 +229,9 @@ form button {
     color: #283593;
     margin: 0;
     font-weight: 700;
-    padding: 1rem;
+    padding: 1rem 10rem;
+    line-height: 1.75lh;
+    text-wrap: balance;
 }
 
 .cert-footer {
