@@ -90,16 +90,17 @@ function handleProfileRegistration(sheet, row, email) {
  * @param {Object} values - Valores del formulario.
  */
 function handleSessionSubmission(sheet, row, email, values) {
-  const id = generateId(email);
+  const sessionName = sheet.getName();
+  const certificateId = generateId(email + sessionName);
   const headers = getHeaders(sheet);
 
-  // 1. Escribir ID
+  // 1. Escribir ID de la constancia
   let idCol = headers.indexOf(ID_HEADER) + 1;
   if (idCol === 0) {
     sheet.getRange(1, headers.length + 1).setValue(ID_HEADER);
     idCol = headers.length + 1;
   }
-  sheet.getRange(row, idCol).setValue(id);
+  sheet.getRange(row, idCol).setValue(certificateId);
 
   // 2. Obtener datos
   const profile = getProfileByEmail(email);
@@ -340,24 +341,25 @@ function findUserCertificates(id) {
     const headers = data.shift();
     const idCol = headers.indexOf(ID_HEADER);
     const tsCol = headers.indexOf(TIMESTAMP_HEADER);
+    const emailCol = headers.indexOf(EMAIL_HEADER);
 
-    if (idCol === -1) continue;
+    if (idCol === -1 || tsCol === -1 || emailCol === -1) {
+        continue;
+    }
 
     for (const row of data) {
-      // El ID de la fila es el ID del usuario para esa sesión específica.
-      // Necesitamos generar el ID de la constancia a partir del correo de esa fila.
-      const emailCol = headers.indexOf(EMAIL_HEADER);
       const email = normalizeEmail(row[emailCol]);
-      const certificateId = generateId(email);
       
-      // Comparamos el ID del usuario (buscado) con el ID generado para el correo de la fila
+      // Comparamos si la fila pertenece al usuario buscado (id)
       if (generateId(email) === id) {
+        // El ID de la constancia ahora es único por sesión, así que lo leemos de la celda
+        const certificateId = row[idCol];
         certificates.push({
-          id: row[idCol], // Este es el ID de la constancia específica
+          id: certificateId,
           title: sheetName,
           date: formatDate(row[tsCol]),
-          cert_url: VERIFY_BASE.replace('index.html?id=', 'index.html?cert_id=') + row[idCol],
-          verify_url: VERIFY_BASE + row[idCol]
+          cert_url: VERIFY_BASE.replace('index.html?id=', 'index.html?cert_id=') + certificateId,
+          verify_url: VERIFY_BASE + certificateId
         });
       }
     }
